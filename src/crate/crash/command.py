@@ -231,6 +231,23 @@ class CrateCmd(Cmd):
         if self.execute('drop ' + statement):
             self.print_success("drop")
 
+    def do_show(self, statement):
+        """ shortcut for other statements:
+
+        show tables ->
+            select .. from information_schema.tables where schema_name = 'doc'
+
+        show shards ->
+            select ... from sys.shards ...
+
+        """
+        if statement == 'tables':
+            self.do_select("* from information_schema.tables where schema_name = 'doc'")
+        elif statement == 'shards':
+            self.do_select('sys.nodes.name, sys.nodes.id, table_name, id, "primary", "state", "relocating_node" \
+                           from sys.shards \
+                           order by sys.nodes.name, table_name, id')
+
     def do_copy(self, statement):
         """execute a SQL copy statement
 
